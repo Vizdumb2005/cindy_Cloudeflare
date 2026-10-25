@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cindy Brain — Control Panel</title>
+<link rel="stylesheet" href="/admin/styles.css" />
+</head>
+<body>
+<header>
+  <h1>Cindy Brain</h1>
+  <nav>
+    <button data-pane="chat" class="active">Chat</button>
+    <button data-pane="tasks">Tasks</button>
+    <button data-pane="node">Node</button>
+    <button data-pane="memory">Memory</button>
+    <button data-pane="skills">Skills</button>
+    <button data-pane="watchdog">Watchdog</button>
+    <button data-pane="pairing">Pairing</button>
+  </nav>
+</header>
+<main>
+  <section id="chat" class="pane active">
+    <aside id="session-list"></aside>
+    <div class="chat-col">
+      <div id="chat-log"></div>
+      <details id="tool-trace"><summary>Tool calls</summary><pre></pre></details>
+      <form id="chat-form"><input id="chat-input" placeholder="Message Cindy…" autocomplete="off" /><button>Send</button></form>
+    </div>
+  </section>
+  <section id="tasks" class="pane"></section>
+  <section id="node" class="pane"></section>
+  <section id="memory" class="pane"></section>
+  <section id="skills" class="pane"></section>
+  <section id="watchdog" class="pane"></section>
+  <section id="pairing" class="pane"></section>
+</main>
+<script src="/admin/app.js"></script>
+</body>
+</html>

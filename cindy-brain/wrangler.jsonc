@@ -1,0 +1,64 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cindy-brain",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "src/panel",
+    "binding": "ASSETS",
+    "not_found_handling": "none"
+  },
+  "ai": { "binding": "AI" },
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "cindy-memory" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cindy_memory",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    { "binding": "ARTIFACTS", "bucket_name": "cindy-artifacts" }
+  ],
+  "queues": {
+    "producers": [{ "binding": "QUEUE", "queue": "mem-ingest" }],
+    "consumers": [
+      {
+        "queue": "mem-ingest",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 3,
+        "dead_letter_queue": "mem-ingest-dlq",
+        "retry_delay": 60
+      }
+    ]
+  },
+  "workflows": [
+    { "binding": "MEM_INGEST", "name": "mem-ingest-workflow", "class_name": "MemIngestWorkflow" }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "CINDY", "class_name": "CindyCore" }]
+  },
+  "exports": {
+    "CindyCore": { "type": "durable-object", "storage": "sqlite" }
+  },
+  "vars": {
+    "BRAIN_VERSION": "1.0.0",
+    "EMBED_MODEL": "@cf/baai/bge-m3",
+    "EMBED_DIMS": "1024",
+    "PLANNER_MODEL": "@cf/meta/llama-3.3-70b-instruct",
+    "CHAT_MODEL": "@cf/meta/llama-3.1-8b-instruct",
+    "FALLBACK_MODEL": "@cf/meta/llama-3-8b-instruct",
+    "REVIEWER_MODEL": "@cf/meta/llama-3.1-8b-instruct-fpfp",
+    "DAILY_TOKEN_BUDGET": "200000",
+    "MEMORY_K": "8",
+    "SESSION_WINDOW_TURNS": "20",
+    "SESSION_WINDOW_TOKENS": "8192"
+  }
+}
