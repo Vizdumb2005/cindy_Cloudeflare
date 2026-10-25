@@ -127,13 +127,45 @@ function assertStableRelease(meta) {
   if (!Array.isArray(meta.assets)) throw new Error(`Release ${meta.tag_name} has no assets array`);
 }
 
-async function fetchReleaseMeta(tag) {
+/**
+ * 当 GitHub API 不可用（如 403 rate limit / 5xx）时的.synthetic兜底：
+ * ripgrep 的 release 资产名完全由版本号 + 平台 triple 决定，且
+ * `https://github.com/<repo>/releases/download/<tag>/<asset>` 直链不受
+ * api.github.com 限流影响。SHA256 校验仍然执行（.sha256 资产同源直链下载）。
+ */
+function syntheticReleaseMeta(tag) {
+  const base = `https://github.com/${REPO}/releases/download/${tag}`;
+  const assets = [];
+  for (const platform of PLATFORMS) {
+    const name = archiveName(tag, platform);
+    assets.push({ name, browser_download_url: `${base}/${name}` });
+    assets.push({ name: `${name}.sha256`, browser_download_url: `${base}/${name}.sha256` });
+  }
+  return {
+    tag_name: tag,
+    name: tag,
+    prerelease: false,
+    draft: false,
+    assets,
+  };
+}
+
+export async function fetchReleaseMeta(tag) {
   const url = tag ? RELEASES_BY_TAG_URL(tag) : RELEASES_LATEST_URL;
-  const res = await fetch(url, { headers: ghHeaders() });
-  if (!res.ok) throw new Error(`GitHub releases ${res.status}: ${url}`);
-  const meta = await res.json();
-  assertStableRelease(meta);
-  return meta;
+  try {
+    const res = await fetch(url, { headers: ghHeaders() });
+    if (!res.ok) throw new Error(`GitHub releases ${res.status}: ${url}`);
+    const meta = await res.json();
+    assertStableRelease(meta);
+    return meta;
+  } catch (err) {
+    // 只在目标 tag 明确时兜底：latest 解析必须依赖真实 API 响应。
+    if (!tag) throw err;
+    console.warn(`GitHub API unavailable (${err.message}); falling back to direct release-download URLs for ${tag}...`);
+    const meta = syntheticReleaseMeta(tag);
+    assertStableRelease(meta);
+    return meta;
+  }
 }
 
 function readCachedVersion() {
