@@ -3,17 +3,26 @@
   "name": "cindy-brain",
   "main": "src/index.ts",
   "compatibility_date": "2025-09-23",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "workers_dev": true,
-  "observability": { "enabled": true },
+  "observability": {
+    "enabled": true
+  },
   "assets": {
     "directory": "src/panel",
     "binding": "ASSETS",
     "not_found_handling": "none"
   },
-  "ai": { "binding": "AI" },
+  "ai": {
+    "binding": "AI"
+  },
   "vectorize": [
-    { "binding": "VECTORIZE", "index_name": "cindy-memory" }
+    {
+      "binding": "VECTORIZE",
+      "index_name": "cindy-memory"
+    }
   ],
   "d1_databases": [
     {
@@ -24,10 +33,18 @@
     }
   ],
   "r2_buckets": [
-    { "binding": "ARTIFACTS", "bucket_name": "cindy-artifacts" }
+    {
+      "binding": "ARTIFACTS",
+      "bucket_name": "cindy-artifacts"
+    }
   ],
   "queues": {
-    "producers": [{ "binding": "QUEUE", "queue": "mem-ingest" }],
+    "producers": [
+      {
+        "binding": "QUEUE",
+        "queue": "mem-ingest"
+      }
+    ],
     "consumers": [
       {
         "queue": "mem-ingest",
@@ -40,13 +57,19 @@
     ]
   },
   "workflows": [
-    { "binding": "MEM_INGEST", "name": "mem-ingest-workflow", "class_name": "MemIngestWorkflow" }
+    {
+      "binding": "MEM_INGEST",
+      "name": "mem-ingest-workflow",
+      "class_name": "MemIngestWorkflow"
+    }
   ],
   "durable_objects": {
-    "bindings": [{ "name": "CINDY", "class_name": "CindyCore" }]
-  },
-  "exports": {
-    "CindyCore": { "type": "durable-object", "storage": "sqlite" }
+    "bindings": [
+      {
+        "name": "CINDY",
+        "class_name": "CindyCore"
+      }
+    ]
   },
   "vars": {
     "BRAIN_VERSION": "1.0.0",
@@ -60,5 +83,13 @@
     "MEMORY_K": "8",
     "SESSION_WINDOW_TURNS": "20",
     "SESSION_WINDOW_TOKENS": "8192"
-  }
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "CindyCore"
+      ]
+    }
+  ]
 }
