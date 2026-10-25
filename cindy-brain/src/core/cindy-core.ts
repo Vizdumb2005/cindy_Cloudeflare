@@ -54,7 +54,7 @@ export class CindyCore extends Agent<Env, CindyState> {
     this.telegram = new TelegramChannel(env, (text, chatId) => this.handleTelegramCommand(text, chatId));
     this.gw = new GatewayClient({
       apiKey: env.LLM_API_KEY,
-      baseUrl: env.LLM_BASE_URL,
+      baseUrl: env.LLM_BASE_URL ?? "https://api.mistral.ai/v1",
       defaultModel: env.CHAT_MODEL,
       fallbackModel: env.FALLBACK_MODEL,
       dailyTokenBudget: Number(env.DAILY_TOKEN_BUDGET ?? 200000),

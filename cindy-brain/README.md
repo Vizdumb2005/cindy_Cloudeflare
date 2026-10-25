@@ -42,8 +42,8 @@ Vectorize dimensions are **frozen at creation** and must match the embedding mod
 ### 2. Secrets
 
 ```bash
-npx wrangler secret put LLM_API_KEY                    # OpenAI-compatible key (AI Gateway BYOK)
-npx wrangler secret put LLM_BASE_URL                   # optional; provider base URL override
+npx wrangler secret put LLM_API_KEY                    # your Mistral API key
+npx wrangler secret put LLM_BASE_URL                   # https://api.mistral.ai/v1 (or, preferably, your AI Gateway mistral endpoint)
 npx wrangler secret put CINDY_NODE_BOOTSTRAP_TOKEN     # one-time pairing token
 npx wrangler secret put GH_PAT                          # GitHub PAT with actions:write
 npx wrangler secret put GH_REPO                         # e.g. user/cindy_Cloudeflare
@@ -55,6 +55,13 @@ npx wrangler secret put PANEL_TOKEN                    # fallback auth for /admi
 ```
 
 For local dev, mirror them in `.dev.vars` (gitignored).
+
+**Mistral models (balanced cost/performance):** chat uses `mistral-small-latest`,
+planning uses `mistral-medium-latest`, review uses `mistral-small-latest`, and the
+cheaper-model fallback is `open-mistral-nemo`. All calls are OpenAI-compatible
+`/chat/completions` against `LLM_BASE_URL`. Pointing `LLM_BASE_URL` at a Cloudflare
+AI Gateway provider endpoint (gateway.ai.cloudflare.com/v1/<account>/<gateway>/mistral)
+adds observability, caching, retries and spend limits on top.
 
 ### 3. Deploy + configure channels
 

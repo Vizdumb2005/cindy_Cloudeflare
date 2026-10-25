@@ -2,8 +2,7 @@
 // and a per-day token budget enforced in CindyCore.
 
 export interface GatewayOptions {
-  gatewayId?: string; // AI Gateway universal endpoint gateway id (optional; direct provider otherwise)
-  baseUrl?: string; // OpenAI-compatible base URL override (secret)
+  baseUrl: string; // OpenAI-compatible base URL: AI Gateway mistral endpoint (preferred) or provider direct
   apiKey?: string;
   defaultModel: string;
   fallbackModel: string;
@@ -55,7 +54,7 @@ function budgetKey(opts: { account?: string }): string {
 }
 
 function optsAccount(opts: GatewayOptions): string {
-  return opts.gatewayId ?? "default";
+  return opts.baseUrl;
 }
 
 export function tokensUsedToday(key = "default"): number {
@@ -132,12 +131,13 @@ export class GatewayClient {
     }
   }
 
+  // All LLM traffic goes through Cloudflare AI Gateway for observability,
+  // caching, retries and spend limits. LLM_BASE_URL may point at a provider
+  // directly (e.g. https://api.mistral.ai/v1) or, preferably, at the AI Gateway
+  // universal endpoint for the provider:
+  //   https://gateway.ai.cloudflare.com/v1/<account>/<gateway-id>/mistral
   private endpoint(): string {
-    if (this.opts.baseUrl) {
-      return `${this.opts.baseUrl.replace(/\/+$/, "")}/chat/completions`;
-    }
-    const gw = this.opts.gatewayId ?? "cindy-gateway";
-    return `https://gateway.ai.cloudflare.com/v1/${gw}/openai/chat/completions`;
+    return `${this.opts.baseUrl.replace(/\/+$/, "")}/chat/completions`;
   }
 
   private async chatOnce(
