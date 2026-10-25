@@ -5,7 +5,20 @@ A personal AI agent whose **brain lives permanently on Cloudflare Workers** and 
 - **Brain 1 — CindyCore**: a single SQLite-backed Durable Object (Agents SDK `Agent`) owning chat, sessions, task orchestration, the node registry, the watchdog, scheduling, and all LLM calls (via AI Gateway).
 - **Brain 2 — Memory**: a RAG long-term-memory service — Workers AI embeddings + Vectorize + D1 + R2, ingestion through Queues and Workflows — continuous memory that survives every restart, eviction, and disconnect.
 - **Control panel**: static single-page app (`src/panel/`), dark-mode, no build step.
-- **Hands kit**: `hands/bootstrap.sh`, `hands/cindy-node.mjs`, `hands/notebook.py`, `hands/kernel-metadata.json`, plus `.github/workflows/restart-kaggle.yml`.
+- **Hands kit**: `hands/bootstrap.sh`, `hands/cindy-node.mjs`, `hands/notebook.py`, `hands/kernel-metadata.json`, plus the root-level `.github/workflows/restart-kaggle.yml` (GitHub requires workflows at the repo root).
+
+## Repository layout
+
+Everything Cloudflare-related lives **inside `cindy-brain/`** — this directory is the
+publish root for Cloudflare (Workers Builds should point at `cindy-brain` as the
+root directory, with build command `npm install && npx wrangler deploy` run from
+there). Nothing at the monorepo root is needed for the Worker: no root
+`wrangler.jsonc`, no root Workers config, no root dependencies.
+
+The one exception is the GitHub Actions workflow `restart-kaggle.yml`, which
+lives at the **repo root** `.github/workflows/` because GitHub Actions only
+discovers workflows there; it checks out the repo and pushes
+`cindy-brain/hands` to Kaggle.
 
 Design invariants: the brain owns context and the hands own execution; hands death costs ≤15 min of work and zero memory; the node connects outbound only (no inbound tunnels); no event replay across reconnects (nodes resync); idempotency everywhere; everything fits Workers Free plan (no containers).
 
