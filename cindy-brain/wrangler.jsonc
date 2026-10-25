@@ -1,4 +1,5 @@
 {
+  "name": "cindy-brain",
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "cindy-brain",
 	"main": "src/index.ts",
@@ -21,14 +22,15 @@
 	"vectorize": [
 		{
 			"binding": "VECTORIZE",
-			"index_name": "cindy-memory"
+			"index_name": "cindy-memory",
+			"remote": true
 		}
 	],
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "cindy_memory",
-			"database_id": "REPLACE_WITH_D1_DATABASE_ID",
+			"database_id": "8b33be4e-ab65-428c-8680-4688ec95cb4f",
 			"migrations_dir": "migrations"
 		},
 		{
@@ -42,6 +44,11 @@
 		{
 			"binding": "ARTIFACTS",
 			"bucket_name": "cindy-artifacts"
+		},
+		{
+			"bucket_name": "cindy-artifacts",
+			"binding": "cindy_artifacts",
+			"remote": true
 		}
 	],
 	"queues": {
